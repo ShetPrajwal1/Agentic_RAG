@@ -1,16 +1,31 @@
-FROM python:3.11-slim
+# Stage 1: Build the React application
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
 # Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN npm install
 
 # Copy source code
-COPY ./frontend /app/frontend
+COPY . .
 
-# Expose port
+# Build the app (outputs to /app/dist)
+RUN npm run build
+
+# Stage 2: Serve the app with Nginx
+FROM nginx:alpine
+
+# Copy the custom Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy the built React app from the previous stage
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expose the port (we match Cloud Run's expected port configured in deploy.yml)
 EXPOSE 8501
 
-# Run streamlit
-CMD ["streamlit", "run", "frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
