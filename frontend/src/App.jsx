@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Send, Upload, FileText, Activity } from 'lucide-react';
 import './index.css';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+const API_URL = (window.ENV && window.ENV.BACKEND_URL) || import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
 function App() {
   const [messages, setMessages] = useState([]);
