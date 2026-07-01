@@ -16,7 +16,7 @@ class AgentState(TypedDict):
     sources: List[str]
 
 # Initialize LLM
-llm = ChatOpenAI(temperature=0, model="gpt-4o", api_key=settings.openai_api_key.get_secret_value())
+llm = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=settings.openai_api_key.get_secret_value())
 
 def query_planner_node(state: AgentState) -> Dict:
     """

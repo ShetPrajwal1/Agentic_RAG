@@ -27,7 +27,7 @@ def extract_and_store_graph(documents: List[Document]):
         return
 
     print(f"Extracting graph from {len(documents)} documents...")
-    llm = ChatOpenAI(temperature=0, model="gpt-4o", api_key=settings.openai_api_key.get_secret_value())
+    llm = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=settings.openai_api_key.get_secret_value())
     
     # We use LLMGraphTransformer to extract nodes and relationships
     llm_transformer = LLMGraphTransformer(llm=llm)

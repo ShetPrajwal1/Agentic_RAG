@@ -27,7 +27,7 @@ def evaluate_with_ragas(question: str, answer: str, contexts: List[str]):
         }
         dataset = Dataset.from_dict(data_sample)
         
-        eval_llm = ChatOpenAI(model="gpt-4o", temperature=0)
+        eval_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
         eval_embeddings = OpenAIEmbeddings()
         
         result = evaluate(
