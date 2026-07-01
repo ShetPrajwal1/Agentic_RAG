@@ -45,7 +45,7 @@ jobs:
 
       - name: Build and Push Frontend Image
         run: |
-          docker build -t $FRONTEND_IMAGE:${{ github.sha }} -t $FRONTEND_IMAGE:latest -f frontend/Dockerfile .
+          docker build -t $FRONTEND_IMAGE:${{ github.sha }} -t $FRONTEND_IMAGE:latest -f frontend/Dockerfile frontend/
           docker push $FRONTEND_IMAGE --all-tags
 
       - name: Deploy Backend to Cloud Run
