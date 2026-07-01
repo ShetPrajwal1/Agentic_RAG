@@ -1,7 +1,9 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File
 from pydantic import BaseModel
 import time
 import os
+import shutil
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.ingestion.document_loader import process_directory
 from backend.ingestion.graph_extractor import extract_and_store_graph
@@ -10,6 +12,14 @@ from backend.agent.workflow import agent_app
 from backend.evaluation.evaluator import evaluate_response
 
 app = FastAPI(title="Agentic GraphRAG API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class IngestRequest(BaseModel):
     directory_path: str
@@ -38,6 +48,25 @@ async def ingest_documents(request: IngestRequest, background_tasks: BackgroundT
         
     background_tasks.add_task(process)
     return {"message": "Ingestion started in the background."}
+
+@app.post("/upload")
+async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+    os.makedirs("./data", exist_ok=True)
+    file_path = os.path.join("./data", file.filename)
+    
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    def process():
+        print(f"Starting ingestion for uploaded file {file.filename}")
+        chunks = process_directory("./data")
+        if chunks:
+            add_documents_to_vector_store(chunks)
+            extract_and_store_graph(chunks)
+            print("Upload Ingestion complete.")
+            
+    background_tasks.add_task(process)
+    return {"message": f"Successfully uploaded {file.filename} and started ingestion."}
 
 @app.post("/query")
 async def query_agent(request: QueryRequest):

@@ -98,6 +98,29 @@ function App() {
     }
   };
 
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadStatus('Uploading and Ingesting...');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      await axios.post(`${API_URL}/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setUploadStatus(`Success! ${file.name} is being ingested.`);
+      setTimeout(() => setUploadStatus(''), 5000);
+    } catch (error) {
+      setUploadStatus('Error uploading file.');
+    }
+  };
+
+  const triggerFileInput = () => {
+    document.getElementById('file-upload').click();
+  };
+
   return (
     <div className="layout">
       {/* Sidebar / Ingestion Panel */}
@@ -108,10 +131,16 @@ function App() {
             Upload your automotive documents into the GraphRAG pipeline.
           </p>
           
-          <div className="dropzone">
+          <div className="dropzone" onClick={triggerFileInput}>
+            <input 
+              type="file" 
+              id="file-upload" 
+              accept=".pdf" 
+              style={{ display: 'none' }} 
+              onChange={handleFileUpload} 
+            />
             <Upload size={32} color="var(--text-secondary)" style={{ marginBottom: '12px' }} />
-            <p>Drag & drop PDFs here</p>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>(or click to select)</p>
+            <p>Click here to upload a PDF</p>
           </div>
 
           <div style={{ marginTop: '16px' }}>
@@ -124,7 +153,7 @@ function App() {
               style={{ width: '100%', marginBottom: '12px' }}
             />
             <button className="button primary" style={{ width: '100%' }} onClick={handleIngest}>
-              Start Ingestion
+              Start Directory Ingestion
             </button>
             {uploadStatus && <p style={{ fontSize: '12px', marginTop: '8px', color: uploadStatus.includes('Error') ? '#ef4444' : '#10b981' }}>{uploadStatus}</p>}
           </div>
