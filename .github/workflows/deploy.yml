@@ -55,6 +55,11 @@ jobs:
           service: agentic-rag-backend
           image: ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
           region: ${{ env.REGION }}
+          env_vars: |
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            NEO4J_URI=${{ secrets.NEO4J_URI }}
+            NEO4J_USERNAME=${{ secrets.NEO4J_USERNAME }}
+            NEO4J_PASSWORD=${{ secrets.NEO4J_PASSWORD }}
           flags: |
             --allow-unauthenticated
 
