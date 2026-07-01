@@ -3,6 +3,9 @@ import os
 
 # Ensure OpenAI API key is set for evaluators
 from backend.config import settings
+import nest_asyncio
+
+nest_asyncio.apply()
 os.environ["OPENAI_API_KEY"] = settings.openai_api_key.get_secret_value()
 
 def evaluate_with_ragas(question: str, answer: str, contexts: List[str]):
