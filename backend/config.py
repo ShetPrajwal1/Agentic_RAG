@@ -7,9 +7,6 @@ class Settings(BaseSettings):
     neo4j_uri: str
     neo4j_username: str
     neo4j_password: str
-    langsmith_api_key: SecretStr | None = None
-    langchain_tracing_v2: str = "false"
-    langchain_project: str = "automotive_graphrag"
     
     # Chroma DB settings
     chroma_persist_directory: str = "./chroma_db"

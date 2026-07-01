@@ -86,7 +86,7 @@ async def query_agent(request: QueryRequest):
         contexts = [doc.page_content for doc in retrieved_docs]
         
         # Evaluate response
-        eval_metrics = evaluate_response(request.question, answer, contexts)
+        eval_metrics = await evaluate_response(request.question, answer, contexts)
         
         latency = time.time() - start_time
         

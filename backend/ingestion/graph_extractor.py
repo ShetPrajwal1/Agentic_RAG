@@ -1,7 +1,7 @@
 import os
 from typing import List
 from langchain_core.documents import Document
-from langchain_community.graphs import Neo4jGraph
+from langchain_neo4j import Neo4jGraph
 from langchain_experimental.graph_transformers import LLMGraphTransformer
 from langchain_openai import ChatOpenAI
 from backend.config import settings
@@ -27,7 +27,7 @@ def extract_and_store_graph(documents: List[Document]):
         return
 
     print(f"Extracting graph from {len(documents)} documents...")
-    llm = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=settings.openai_api_key.get_secret_value())
+    llm = ChatOpenAI(model="o3-mini", api_key=settings.openai_api_key.get_secret_value())
     
     # We use LLMGraphTransformer to extract nodes and relationships
     llm_transformer = LLMGraphTransformer(llm=llm)

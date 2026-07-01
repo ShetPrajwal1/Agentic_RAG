@@ -3,6 +3,7 @@ langchain-openai
 langchain-community
 langgraph
 neo4j
+langchain-neo4j
 chromadb
 fastapi
 uvicorn
