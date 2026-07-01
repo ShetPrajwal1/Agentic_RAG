@@ -1,0 +1,70 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  REPOSITORY: agentic-rag-repo
+  BACKEND_IMAGE: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/agentic-rag-repo/backend
+  FRONTEND_IMAGE: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/agentic-rag-repo/frontend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Authenticate Docker to Artifact Registry
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t $BACKEND_IMAGE:${{ github.sha }} -t $BACKEND_IMAGE:latest -f backend/Dockerfile .
+          docker push $BACKEND_IMAGE --all-tags
+
+      - name: Build and Push Frontend Image
+        run: |
+          docker build -t $FRONTEND_IMAGE:${{ github.sha }} -t $FRONTEND_IMAGE:latest -f frontend/Dockerfile .
+          docker push $FRONTEND_IMAGE --all-tags
+
+      - name: Deploy Backend to Cloud Run
+        id: deploy-backend
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: agentic-rag-backend
+          image: ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+          region: ${{ env.REGION }}
+          flags: |
+            --allow-unauthenticated
+
+      - name: Deploy Frontend to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: agentic-rag-frontend
+          image: ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+          region: ${{ env.REGION }}
+          env_vars: |
+            BACKEND_URL=${{ steps.deploy-backend.outputs.url }}
+          flags: |
+            --allow-unauthenticated
