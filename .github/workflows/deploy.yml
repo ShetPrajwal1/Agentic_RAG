@@ -63,6 +63,7 @@ jobs:
           flags: |
             --allow-unauthenticated
             --port=8000
+            --memory=2Gi
 
       - name: Deploy Frontend to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
@@ -75,3 +76,4 @@ jobs:
           flags: |
             --allow-unauthenticated
             --port=8501
+            --memory=1Gi
