@@ -169,7 +169,7 @@ function App() {
                   <div key={key}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
                       <span style={{ textTransform: 'capitalize' }}>{key}</span>
-                      <span>{typeof value === 'number' ? value.toFixed(2) : value}</span>
+                      <span>{typeof value === 'object' ? JSON.stringify(value) : (typeof value === 'number' ? value.toFixed(2) : value)}</span>
                     </div>
                     {typeof value === 'number' && (
                       <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
