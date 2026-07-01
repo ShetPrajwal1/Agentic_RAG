@@ -62,6 +62,7 @@ jobs:
             NEO4J_PASSWORD=${{ secrets.NEO4J_PASSWORD }}
           flags: |
             --allow-unauthenticated
+            --port=8000
 
       - name: Deploy Frontend to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
@@ -73,3 +74,4 @@ jobs:
             BACKEND_URL=${{ steps.deploy-backend.outputs.url }}
           flags: |
             --allow-unauthenticated
+            --port=8501
