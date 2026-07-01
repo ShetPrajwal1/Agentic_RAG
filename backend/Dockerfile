@@ -9,6 +9,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy source code
 COPY ./backend /app/backend
 
+# Pre-download HuggingFace models to prevent massive cold-start hangs on Cloud Run
+RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
+
 
 # Expose port
 EXPOSE 8000
